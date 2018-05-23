@@ -32,5 +32,4 @@ spring:
     cache: false
 
 mybatis:
-  typeAliasesPackage: com.yws.springbatis.po
   mapperLocations: classpath:com/yws/springbatis/mapper/*Mapper.xml
