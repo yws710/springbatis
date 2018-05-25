@@ -1,6 +1,9 @@
 package com.yws.springbatis.controller;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,5 +32,14 @@ public class UserController {
 	@ResponseBody
 	public UserPo getById(Integer id) throws Exception {
 		return userDao.findById(id);
+	}
+	
+	@GetMapping("date")
+	@ResponseBody
+	public Map<String,Object> date() throws Exception {
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("name", "张三");
+		map.put("birthday", new Date());
+		return map;
 	}
 }

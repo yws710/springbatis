@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.yws.springbatis.po.UserPo;
 
-//@Mapper // 在启动类上加@MapperScan注解，则这里不需要使用@Mapper注解
+@Mapper // 在启动类上加@MapperScan注解，则这里不需要使用@Mapper注解
 public interface UserDao {
 
 	/**

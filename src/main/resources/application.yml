@@ -32,4 +32,8 @@ spring:
     cache: false
 
 mybatis:
+  #typeAliasesPackage: com.yws.springbatis.po # 这里不支持使用通配符，多模块的话要写多个路径；该配置可以不要，在映射文件中使用类的全路径名即可。
   mapperLocations: classpath:com/yws/springbatis/mapper/*Mapper.xml
+  
+jobs: 
+  fixedDelay: 3000
