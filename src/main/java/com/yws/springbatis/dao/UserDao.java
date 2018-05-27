@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.yws.springbatis.po.UserPo;
+import com.yws.springbatis.domain.User;
 
 @Mapper // 在启动类上加@MapperScan注解，则这里不需要使用@Mapper注解
 public interface UserDao {
@@ -18,15 +18,15 @@ public interface UserDao {
 	 * 查询所有
 	 * @return
 	 */
-	List<UserPo> findAll();
+	List<User> findAll();
 	
 	/**
 	 * 根据id查找
 	 * @param id
 	 * @return
 	 */
-	@Select("select id,user_name as username,email from t_user where id = #{id}")
-	UserPo findById(@Param("id") Integer id);
+	@Select("select * from sys_user where user_id = #{id}")
+	User findById(@Param("id") Long id);
 	
 	/**
 	 * 保存
@@ -34,14 +34,16 @@ public interface UserDao {
 	 * @return
 	 */
 	@Insert("insert into t_user(user_name,email) values(#{username},#{email})")
-	int insert(UserPo userPo);
+	int insert(User user);
 	
 	/**
 	 * 修改
 	 * @param userPo
 	 */
 	@Update("update t_user set user_name = #{username},email = #{email} where id = #{id}")
-	void update(UserPo userPo);
+	void update(User user);
+	
+	void updateById(User user);
 	
 	/**
 	 * 根据id删除

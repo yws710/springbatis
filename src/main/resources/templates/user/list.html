@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<title>用户列表</title>
+	<link href="kendo/styles/kendo.common.min.css" rel="stylesheet" />
+	<link href="kendo/styles/kendo.default.min.css" rel="stylesheet" />
+	<script type="text/javascript" src="kendo/js/jquery.min.js"></script>
+	<script type="text/javascript" src="kendo/js/kendo.web.min.js"></script>
+	<script type="text/javascript" src="kendo/message/kendo.messages.zh-CN.js"></script>
+</head>
+<body>
+	<div id="users"></div>
+</body>
+
+	<script>
+	    $(document).ready(function() {
+	    	//kendo.culture("zh_CN");//使用kendoui的中文版   
+	        $("#users").kendoGrid({
+	        	// 数据源加载
+	            dataSource: {
+	                transport: {
+	                	read: {
+	                		url: "http://localhost:8080/users/list",
+	                		dataType: "json"
+	                	},
+	                	update: {
+	                		url: "http://localhost:8080/users/edit",
+	                		dataType: "json",
+	                		type: "post",
+	                		contentType: "application/json; charset=utf-8"
+	                	},
+	                	destroy: {
+	                		url: "http://localhost:8080/users/del",
+	                		dataType: "json"
+	                	},
+	                	create: {
+	                		url: "http://localhost:8080/users/add",
+	                		dataType: "json",
+	                		type: "post",
+	                		contentType: "application/json; charset=utf-8"
+	                	},
+	                	 parameterMap: function(data, type) { // parameterMap是用来往后台传递参数的。
+                             if (type !== "read") {
+                                 return kendo.stringify(data);
+                             }
+                         },
+                         requestEnd: function(e) { // 不起作用
+                        	 console.log("requestEnd");
+                             var response = e.response;
+                             console.log(JSON.stringify(response));
+                             if(response){
+                                 var type = e.type;
+                                 if(type !='read'){
+                                     var status = response.status;
+                                     if(status == 200){
+                                         //lert(response.message);
+                                         this.read();
+                                     } else {
+                                         alert(response.message);
+                                     }
+                                 }
+                             }else{
+                                 alert("服务器异常，请重试！");
+                             }
+                             
+                         },
+
+	                },
+	                schema: { // scheme是用来规范从后台拿到的数据的。
+	                	type: "json",
+                        data: function (data) {
+                            return data; //指向返回json中的table数据项
+                        },
+	                	errors: function(response) {
+	                		return response.error; // 错误信息显示
+	                	},
+	                    model: {
+	                    	id: "userId",
+	                        fields: {
+	                        	//userId: { type: "number" },
+	                            //username: { type: "string" }
+	                        }
+	                    }
+	                },
+	                pageSize: 5, // 每页显示条数，客户端分页
+	                //serverPaging: true, // 支持服务端分页功能，会导致客户端分页失效
+	                //serverFiltering: true, // 支持服务端查询功能
+	                //serverSorting: true // 支持服务端排序功能
+	            },
+	            height: 430, // 表格高度设置
+	            navigatable: true,
+	            //selectable : "multiple",// 多选
+	            batch: true, //可批量操作
+	            filterable: true, // 筛选
+	            sortable: true, // 可排序
+	            //pageable: true,
+	            pageable: {  
+                    refresh: true,  
+                    pageSizes: true,  
+                    buttonCount: 5, // 限制页数按钮的显示个数
+                    pageSizes : true,// 是否允许调整一页显示的行数，可设置[5, 10, 15]
+                },  
+	            groupable: true, // 分组
+	            toolbar: [ // 工具条，可使用模板自定义。
+	            	{
+	            		name: "create",
+	            		text: "添加"
+	            	}
+	            ],
+	            columns: [ // 表格列设置
+	            	{field: "userId",title: "ID", hidden: true,},
+	            	{field: "username",title: "用户名"},
+	            	{field: "email",title: "邮箱"},
+	            	{field: "mobile",title: "手机号"},
+	            	{
+	            		field: "status",
+	            		title: "状态",
+	            		template: function(item){
+	            			if(item.status == '1'){
+	            				return "正常";
+	            			}else if(item.status == '0'){
+	            				return "禁用";
+	            			}else{
+	            				return "未知";
+	            			}
+	            		}
+	            	},
+	            	{
+	            		field: "createTime",
+	            		title: "创建时间",
+	            		template: function(item){
+	            			var time = item.createTime;
+	            			return kendo.toString(new Date(time), "yyyy-MM-dd HH:mm:ss");
+	            		}
+	            	},
+	            	{
+		            	command: [ // 对数据行的操作
+		            		/* {
+		            			text: "修改", // 名称
+		            			click: editFunction // 自定义点击事件
+		            		},
+		            		{
+		            			text: "删除", // 名称
+		            			click: editFunction // 自定义点击事件
+		            		} */
+		            		{
+		            			name: "edit",
+		            			text: {
+		            				edit: "修改",
+		            				cancel: "关闭",
+		            				update: "提交"
+		            			}
+		            		},
+		            		{
+		            			name: "destroy",
+		            			text: "删除"
+		            		}
+		            	],
+		            	title: "操作",
+		            	width: "180px"
+	        		}
+	            ],
+	            editable: "inline"
+	          /*   editable: {
+	                confirmation: "您确定要进行删除操作吗？", // 设置删除时显示的确认信息
+	                mode: "popup", // 设置编辑形式为弹出框(popup)还是在列表中(inline)
+	                window: {
+	                    title: "新增"
+	                }
+	            },
+	            // 点击编辑按钮时执行的方法
+	            edit: function (e) {
+	                var editWindow = e.container.data("kendoWindow");
+	                if (e.model.isNew()) {
+	                    editWindow.title('新增');
+	                }
+	                else {
+	                    editWindow.title('编辑');
+	                }
+	            }, */
+	        });
+	    	
+	        function editFunction(e){
+	        	// e.target是按钮的DOM元素
+	        	var tr = $(e.target).closest("tr"); // 得到当前行
+	        	var data = this.dataItem(tr); // 获取该行的数据
+	        }
+	    });
+	</script>
+
+</html>
